@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Modello CNN</title>
+        <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='favicon.jpg') }}"> 
+        <link rel="stylesheet" type="text/css" href="/static/style.css">  <!-- CSS link -->
+    </head>
+    <body>
+        <div class="title-container">
+            <div class="title-wrapper">
+                <h1><a href="/">Predizione prugne</a></h1>
+            </div>
+            <img src="{{ url_for('static', filename='favicon_sfondo.jpg') }}" alt="Icona" class="title-icon">
+        </div>
+        <h3 class="upload-title">Carica un'immagine</h3>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" multiple>
+            <input type="submit" value="Predici">
+            <!-- Pulsante per acquisire immagini dalla webcam -->
+            <button type="button" class="webcam-button" id="webcam-button">Usa webcam</button>           
+        </form>      
+        {% if error_message %}
+            <div id="error-message">
+                <p>{{ error_message }}</p>
+            </div>
+        {% endif %}
+        {% if predictions %}
+        {% for image_predictions, image_url, yolov5_prediction, yolov8_prediction, yolov5_url, yolov8_url in zip(predictions, image_urls, yolov5_predictions, yolov8_predictions, processed_image_urls_yolov5, processed_image_urls_yolov8) %}
+        <div class="model-prediction">
+            <div class="prediction-text">
+                <div class="prediction-row">                    
+                    <h3>ResNet50:</h3>
+                    <p>{{ image_predictions[0] }}</p>
+                </div>
+                <div class="prediction-row">
+                    <h3>EfficientNetB1:</h3>
+                    <p>{{ image_predictions[1] }}</p>
+                </div>
+                <div class="prediction-row">
+                    <h3>YOLOv5:</h3>
+                    <p>{{ yolov5_prediction }}</p>
+                </div>
+                <div class="prediction-row">
+                    <h3>YOLOv8:</h3>
+                    <p>{{ yolov8_prediction }}</p>
+                </div>
+            </div>
+            <div class="prediction-images">
+                <div class="image-container image-container-1">
+                    <p>Foto originale</p>
+                    <img class="prediction-image" src="{{ image_url }}" alt="Foto originale">
+                </div>
+                <div class="image-container image-container-2">
+                    <p>Predizione Yolov5</p>
+                    <img class="prediction-image" src="{{ yolov5_url }}" alt="Predizione Yolov5">
+                </div>
+                <div class="image-container image-container-3">
+                    <p>Predizione Yolov8</p>
+                    <img class="prediction-image" src="{{ yolov8_url }}" alt="Predizione Yolov8">
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+        <!-- Webcam Modal -->
+        <div id="webcam-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <video id="webcam-video" width="256" height="256" autoplay></video>
+                <canvas id="webcam-canvas" width="256" height="256" style="display: none;"></canvas>
+                <!-- Elemento per mostrare un'anteprima dell'immagine acquisita -->
+                <img id="webcam-preview" width="256" height="256" style="display: center;">
+                <button type="button" class="capture-button" id="capture-button" style="display: none;">Scatta foto</button>
+                <!-- Pulsante per fare una previsione con l'immagine acquisita -->
+                <br/>
+                <button type="button" class="webcam-button" id="predict-button" style="display: none;">Predici da webcam</button>        
+            </div>
+        </div>
+        <script src="/static/script.js"></script>
+    </body>
+</html>
